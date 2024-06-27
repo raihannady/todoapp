@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, createContext } from "react";
 // import reactLogo from "./assets/react.svg";
 // import viteLogo from "/vite.svg";
 // import "./App.css";
@@ -6,6 +6,8 @@ import { useState } from "react";
 import Todoform from "./components/TodoForm";
 import Todos from "./components/Todos";
 import TodoItem from "./components/Todos/TodoItem";
+
+export const TodoContext = createContext();
 
 function App() {
   // const [count, setCount] = useState(0)
@@ -37,14 +39,38 @@ function App() {
     setTodos(updatedTodos);
   };
 
+  const deleteTodo = (id) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
+
+  const addTodo = (todoTitle) => {
+    if (todoTitle === "") {
+      return;
+    }
+
+    const newTodo = {
+      id: todos.length + 1,
+      title: todoTitle,
+      completed: false,
+    };
+
+    const updatedTodos = todos.concat(newTodo);
+    setTodos(updatedTodos);
+  };
+
   return (
     <>
-      <div style={styles.container}>
-        <h1 style={styles.title}>My Todo List</h1>
-        <Todos todos={todos} toggleCompleted={toggleCompleted} />
-      </div>
-      {/* <Todoform />
-      <Todos todos={todos} /> */}
+      <TodoContext.Provider value={{ addTodo, toggleCompleted, deleteTodo }}>
+        <div style={styles.container}>
+          <h1 style={styles.title}>My Todo List</h1>
+          <Todoform addTodo={addTodo} />
+          <Todos
+            todos={todos}
+            toggleCompleted={toggleCompleted}
+            deleteTodo={deleteTodo}
+          />
+        </div>
+      </TodoContext.Provider>
     </>
   );
 }
